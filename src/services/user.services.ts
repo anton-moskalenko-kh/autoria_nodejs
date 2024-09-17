@@ -1,14 +1,24 @@
 import { RoleEnum } from "../enums/role.enum";
 import { StatusEnum } from "../enums/status.enum";
 import { ApiError } from "../errors/api-error";
-import { IAdsInterface } from "../interfaces/ads.interface";
-import { IUserInterface } from "../interfaces/user.interface";
+import { IAdsListQuery, IAdsResponseList } from "../interfaces/ads.interface";
+import {
+  IUserInterface,
+  IUserListQuery,
+  IUsersResponseList,
+} from "../interfaces/user.interface";
+import { AdPresenter } from "../presenters/ads.presenter";
+import { UserPresenter } from "../presenters/user.presenter";
 import { adsRepository } from "../repositories/ads.repository";
 import { userRepository } from "../repositories/user.repository";
 
 class UserServices {
-  public async getAllUsers(): Promise<IUserInterface[]> {
-    return await userRepository.getAllUsers();
+  public async getAllUsers(query: IUserListQuery): Promise<IUsersResponseList> {
+    const [users, total] = await userRepository.getAllUsers(query);
+    if (users.length === 0) {
+      throw new ApiError("Users not found", 404);
+    }
+    return UserPresenter.toResponseList(users, total, query);
   }
 
   public async getById(userId: string): Promise<IUserInterface> {
@@ -16,8 +26,12 @@ class UserServices {
     return await userRepository.getById(userId);
   }
 
-  public async getAllUserAds(userId: string): Promise<IAdsInterface[]> {
-    return await adsRepository.getAllUserAds(userId);
+  public async getAllUserAds(
+    userId: string,
+    query: IAdsListQuery,
+  ): Promise<IAdsResponseList> {
+    const [ads, total] = await adsRepository.getAllUserAds(userId, query);
+    return AdPresenter.toResponseList(ads, total, query);
   }
 
   public async updateById(
@@ -48,10 +62,20 @@ class UserServices {
     await userRepository.updateUserStatus(userId, status);
   }
 
+  public async getBlockedUser(
+    query: IUserListQuery,
+  ): Promise<IUsersResponseList> {
+    const [users, total] = await userRepository.getBlockedUser(query);
+    if (users.length === 0) {
+      throw new ApiError("Users not found", 404);
+    }
+    return UserPresenter.toResponseList(users, total, query);
+  }
+
   private async isUserExist(userId: string): Promise<void> {
     const user = await userRepository.getByParams({ _id: userId });
     if (!user) {
-      throw new ApiError(`User with id ${userId} is doesn't exist`, 404);
+      throw new ApiError(`User with id ${userId} is doesn't exist`, 400);
     }
   }
 }

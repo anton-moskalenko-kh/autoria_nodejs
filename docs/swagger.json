@@ -1,0 +1,1640 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is test nodejs/express api for clone of auto-ria website",
+    "version": "1.0.0",
+    "title": " API",
+    "contact": {
+      "email": "anton.moskalenko.kh@gmail.com"
+    }
+  },
+  "tags": [],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {
+    "/ads": {
+      "get": {
+        "tags": ["Advertisement"],
+        "summary": "Get list of active advertisements",
+        "description": "This is open endpoint for getting all active advertisements list",
+        "operationId": "getAllAds",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/AdsListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Ads not found"
+          }
+        }
+      }
+    },
+    "/ads/{adId}": {
+      "get": {
+        "tags": [
+          "Advertisement"
+        ],
+        "summary": "Get specific advertisement by adID",
+        "description": "Get information about one advertisement based on adId",
+        "parameters": [
+          {
+            "name": "adId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the ad"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Ad"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Advertisement not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Advertisement"
+        ],
+        "summary": "Update specific advertisement by adID",
+        "description": "Update information about one advertisement based on adId",
+        "parameters": [
+          {
+            "name": "adId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the ad"
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdatedAd"
+            }
+          }
+        ],
+        "security": [{"jwt_token": []}],
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Ad"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorised"
+          },
+          "403": {
+            "description": "Forbidden. This user haven't access for this action"
+          },
+          "404": {
+            "description": "Advertisement not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Advertisement"
+        ],
+        "summary": "Delete specific advertisement by adID",
+        "description": "Delete one advertisement based on adId",
+        "parameters": [
+          {
+            "name": "adId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the ad"
+            }
+          }
+        ],
+        "security": [{"jwt_token": []}],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorised"
+          },
+          "403": {
+            "description": "Forbidden. This user haven't access for this action"
+          },
+          "404": {
+            "description": "Advertisement not found"
+          }
+        }
+      }
+    },
+    "/ads/{userId}/all": {
+      "get": {
+        "tags": ["Advertisement"],
+        "summary": "Get list active advertisements of specific user bases on his userId",
+        "description": "This is open endpoint for getting active advertisements of specific user",
+        "operationId": "getUserAds",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the user"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/AdsListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "This user doesn't have any ads"
+          }
+        }
+      }
+    },
+    "/ads/{adId}/contacts": {
+      "get": {
+        "tags": ["Advertisement"],
+        "summary": "Get seller contact of the specific advertisement",
+        "description": "This is open endpoint for getting seller contact of the specific advertisement",
+        "operationId": "getUserContact",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "adId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the ad"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/UserContacts"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Ad with such adId is doesn't exist"
+          }
+        }
+      }
+    },
+    "/ads/{adId}/statistics": {
+      "get": {
+        "tags": ["Advertisement"],
+        "summary": "Get statistics by specific advertisement",
+        "description": "This is closed endpoint for getting statistics by specific advertisement. Only for premium account",
+        "operationId": "getAdStatistics",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "parameters": [
+          {
+            "name": "adId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the ad"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Statistics"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden. This user haven't access for this action"
+          }
+        }
+      }
+    },
+    "/ads/inactive": {
+      "get": {
+        "tags": ["Advertisement"],
+        "summary": "Get list of inactive advertisements",
+        "description": "This is closed endpoint only for moderator and admin for getting all inactive advertisements list",
+        "operationId": "getAllInactiveAds",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/AdsListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden. This user haven't access for this action"
+          },
+          "404": {
+            "description": "Ads not found"
+          }
+        }
+      }
+    },
+    "/ads/inactive/{adId}": {
+      "patch": {
+        "tags": ["Advertisement"],
+        "summary": "Update description and status of inactive advertisement by adId",
+        "description": "This is closed endpoint only for moderator and admin for updating description and status inactive advertisement",
+        "operationId": "updateInactiveAd",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "adId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the ad"
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateInactiveAd"
+            }
+          }
+        ],
+        "security": [{"jwt_token": []}],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Ad"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden. This user haven't access for this action"
+          },
+          "404": {
+            "description": "Ad not found"
+          }
+        }
+      }
+    },
+    "/ads/create": {
+      "post": {
+        "tags": ["Advertisement"],
+        "summary": "Create a new car ad",
+        "description": "Closed endpoint for creation a new car advertisement with the provided details.",
+        "operationId": "getAllInactiveAds",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewCarAd"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Car ad created successfully",
+            "schema": {
+              "$ref": "#/definitions/Ad"
+            }
+          },
+          "400": {
+            "description": "Invalid input data."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden. This user haven't access for this action"
+          },
+          "404": {
+            "description": "Ads not found"
+          }
+        }
+      }
+    },
+    "/ads/{adId}/images": {
+      "post": {
+        "tags": ["Advertisement"],
+        "summary": "(testing only in postman) Upload images for advertisement",
+        "description": "Closed endpoint for uploading images for advertisement. Testing only in postman, swagger does not want to accept image array",
+        "operationId": "uploadImages",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "in": "adId",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the car ad to which the images will be uploaded."
+            }
+          },
+          {
+            "name": "files",
+            "in": "formData",
+            "description": "List of images to upload",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "file"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Ad"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden. This user haven't access for this action"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Advertisement"],
+        "summary": "(testing only in postman) Delete images from advertisement",
+        "description": "Closed endpoint for deleting images from advertisement. Testing only in postman, swagger does not want to accept image array",
+        "operationId": "deleteImages",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "parameters": [
+          {
+            "in": "adId",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the car ad to which the images will be uploaded."
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Ad"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden. This user haven't access for this action"
+          }
+        }
+      }
+    },
+    "/auth/sign-up": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Create a new user",
+        "description": "Open endpoint for creation new user ",
+        "operationId": "sign-up user",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegisterRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "schema": {
+              "$ref": "#/definitions/RegisterResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid input data."
+          },
+          "409": {
+            "description": "Conflict. This email is already exist"
+          }
+        }
+      }
+    },
+    "/auth/sign-up/admin": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Create new moderator or admin",
+        "description": "Closed endpoint for creation new moderator or admin. Only for moderator ",
+        "operationId": "sign-up",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegisterModeratorOrAdmin"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "schema": {
+              "$ref": "#/definitions/RegisterResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid input data."
+          },
+          "401": {
+            "description": "Unauthorised"
+          },
+          "403": {
+            "description": "You haven't access to this action"
+          },
+
+          "409": {
+            "description": "Conflict. This email is already exist"
+          }
+        }
+      }
+    },
+    "/auth/sign-in": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Sign-in user",
+        "description": "Open endpoint for Sign-in user ",
+        "operationId": "sign-in",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SignIn"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/RegisterResponse"
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Refresh pair of tokens",
+        "description": "Closed endpoint for refresh tokens for user",
+        "operationId": "refresh",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Tokens"
+            }
+          },
+          "401": {
+            "description": "Unauthorised"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Logout user",
+        "description": "Closed endpoint for logout user",
+        "operationId": "Logout",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "401": {
+            "description": "Unauthorised"
+          }
+        }
+      }
+    },
+    "/auth/logout-all": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Logout user",
+        "description": "Closed endpoint for logout user",
+        "operationId": "Logout",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "401": {
+            "description": "Unauthorised"
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Forgot password",
+        "description": "Open endpoint for restore password of user",
+        "operationId": "ForgotPassword",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "hello@gmail.com"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      }
+    },
+    "/auth/forgot-password/change": {
+      "put": {
+        "tags": ["Auth"],
+        "summary": "Сhange forgot password",
+        "description": "Closed endpoint with action token for change forgotten password of user",
+        "operationId": "ForgotPassword",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "password": {
+                  "type": "string",
+                  "example": "IamTestPassword&1111"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorised"
+          }
+        }
+      }
+    },
+    "/auth/verify": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Verify user",
+        "description": "Verify user with action token in email letter",
+        "operationId": "VerifyUser",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorised"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get list of active verified users",
+        "description": "This is open endpoint for getting all active verified users",
+        "operationId": "getAllUsers",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/UserListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Users not found"
+          }
+        }
+      }
+    },
+    "/users/{userId}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get specific user by userID",
+        "description": "Get information about one user based on userId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the user"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update specific user by userID",
+        "description": "Update information about one user based on userId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the ad"
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdatedUser"
+            }
+          }
+        ],
+        "security": [{"jwt_token": []}],
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorised"
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete specific user by userID",
+        "description": "Delete one user based on userId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the ad"
+            }
+          }
+        ],
+        "security": [{"jwt_token": []}],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorised"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/users/blocked": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get list of blocked users",
+        "description": "This is closed endpoint for getting all blocked users. Only for moderator and admin",
+        "operationId": "getBlockedUsers",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/UserListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Users not found"
+          }
+        }
+      }
+    },
+    "/users/{userId}/ads": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get list of active advertisement of specific user",
+        "description": "This is closed endpoint for getting all active advertisement of specific user",
+        "operationId": "getAllAdsOfUser",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the ad"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/AdsListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/users/status/{userId}": {
+      "patch": {
+        "tags": ["Users"],
+        "summary": "Change user status",
+        "description": "This is closed endpoint for change user status",
+        "operationId": "change user status",
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "security": [{"jwt_token": []}],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The unique identifier of the ad"
+            }
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": ["active", "block"],
+                  "example": "blocked"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "jwt_token": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "definitions": {
+    "Ad": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "description": "Unique identifier for the car."
+        },
+        "brand": {
+          "type": "string",
+          "description": "Brand of the car."
+        },
+        "model": {
+          "type": "string",
+          "description": "Model of the car."
+        },
+        "year": {
+          "type": "integer",
+          "description": "Year of manufacture."
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "description": "List of image URLs for the car."
+        },
+        "price": {
+          "type": "number",
+          "format": "float",
+          "description": "Price of the car."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the car."
+        },
+        "city": {
+          "type": "string",
+          "description": "City where the car is located."
+        },
+        "_userId": {
+          "type": "string",
+          "description": "Unique identifier for the user who create the advertisement."
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Indicates if the car listing is active."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the car listing was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the car listing was last updated."
+        },
+        "message": {
+          "type": "string",
+          "description": "Optional message from moderator or admin"
+        }
+      },
+      "required": [
+        "_id",
+        "brand",
+        "model",
+        "year",
+        "price",
+        "description",
+        "city",
+        "_userId",
+        "isActive",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "UpdatedAd": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "description": "Brand of the car."
+        },
+        "model": {
+          "type": "string",
+          "description": "Model of the car."
+        },
+        "year": {
+          "type": "integer",
+          "description": "Year of manufacture."
+        },
+        "price": {
+          "type": "number",
+          "format": "float",
+          "description": "Price of the car."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the car."
+        },
+        "city": {
+          "type": "string",
+          "description": "City where the car is located."
+        }
+      }
+    },
+    "UpdateInactiveAd": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Description of the ad"
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Status of the ad"
+        },
+        "message": {
+          "type": "string",
+          "description": "Optional message from moderator or admin"
+        }
+      }
+    },
+    "AdsListResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Ad"
+          },
+          "description": "List of car objects."
+        },
+        "total": {
+          "type": "integer",
+          "description": "Total number of car listings."
+        },
+        "orderBy": {
+          "type": "string",
+          "description": "Field by which the results are ordered."
+        },
+        "order": {
+          "type": "string",
+          "description": "Order of the results, e.g., ascending or descending."
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Number of items per page."
+        },
+        "page": {
+          "type": "integer",
+          "description": "Current page number."
+        }
+      },
+      "required": [
+        "data",
+        "total",
+        "orderBy",
+        "order",
+        "limit",
+        "page"
+      ]
+    },
+    "UserContacts": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the user."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Email address of the user."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number of the user."
+        }
+      },
+      "required": [
+        "_id",
+        "name",
+        "email",
+        "phone"
+      ]
+    },
+    "Statistics": {
+      "type": "object",
+      "properties": {
+        "totalViews": {
+          "type": "integer",
+          "description": "Total number of views for the ad."
+        },
+        "todayViews": {
+          "type": "integer",
+          "description": "Number of views for the ad today."
+        },
+        "weekViews": {
+          "type": "integer",
+          "description": "Number of views for the ad in the past week."
+        },
+        "monthViews": {
+          "type": "integer",
+          "description": "Number of views for the ad in the past month."
+        },
+        "averagePriceByCity": {
+          "type": "string",
+          "description": "Average price of cars in the city (e.g., Lviv)."
+        },
+        "averagePriceByUkraine": {
+          "type": "string",
+          "description": "Average price of cars in Ukraine."
+        }
+      },
+      "required": [
+        "totalViews",
+        "todayViews",
+        "weekViews",
+        "monthViews",
+        "averagePriceByCity",
+        "averagePriceByUkraine"
+      ]
+    },
+    "NewCarAd": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "description": "Brand of the car.",
+          "example": "Chevrolet"
+        },
+        "model": {
+          "type": "string",
+          "description": "Model of the car.",
+          "example": "Cruze"
+        },
+        "year": {
+          "type": "integer",
+          "description": "Year of manufacture.",
+          "example": 2010
+        },
+        "price": {
+          "type": "number",
+          "format": "float",
+          "description": "Price of the car.",
+          "example": 6000
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the car ad.",
+          "example": "Good car with great history"
+        },
+        "city": {
+          "type": "string",
+          "description": "City where the car is located.",
+          "example": "Odessa"
+        }
+      },
+      "required": [
+        "brand",
+        "model",
+        "year",
+        "price",
+        "description",
+        "city"
+      ]
+    },
+    "RegisterRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Anton231096"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "example": "hello23@gmail.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "sdfsDf34&"
+        },
+        "phone": {
+          "type": "string",
+          "example": "+38093345000"
+        }
+      },
+      "required": [
+        "name",
+        "email",
+        "password",
+        "phone"
+      ]
+    },
+    "RegisterResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "example": "Anton231096"
+            },
+            "email": {
+              "type": "string",
+              "format": "email",
+              "example": "hello23@gmail.com"
+            },
+            "phone": {
+              "type": "string",
+              "example": "+38093345000"
+            },
+            "package": {
+              "type": "string",
+              "example": "base"
+            },
+            "role": {
+              "type": "string",
+              "example": "user"
+            },
+            "isVerified": {
+              "type": "boolean",
+              "example": false
+            },
+            "status": {
+              "type": "string",
+              "example": "active"
+            },
+            "_id": {
+              "type": "string",
+              "example": "66e9105887e4475d35c0d601"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-09-17T05:15:04.994Z"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-09-17T05:15:04.994Z"
+            }
+          },
+          "required": [
+            "name",
+            "email",
+            "phone",
+            "package",
+            "role",
+            "isVerified",
+            "status",
+            "_id",
+            "createdAt",
+            "updatedAt"
+          ]
+        },
+        "tokens": {
+          "type": "object",
+          "properties": {
+            "accessToken": {
+              "type": "string",
+              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmU5MTA1ODg3ZTQ0NzVkMzVjMGQ2MDEiLCJyb2xlIjoidXNlciIsImlhdCI6MTcyNjU1MDEwNSwiZXhwIjoxNzI2NTYwOTA1fQ.cU1WXGCg6FJrEaEqPFrC5FYkSAbR5oDXcjG95wOI1lM"
+            },
+            "refreshToken": {
+              "type": "string",
+              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmU5MTA1ODg3ZTQ0NzVkMzVjMGQ2MDEiLCJyb2xlIjoidXNlciIsImlhdCI6MTcyNjU1MDEwNSwiZXhwIjoxNzI2NjM2NTA1fQ.u4BDLOPi4RUZEXsL6qSznR-Ah64lm3wU2V8xZGX2HvQ"
+            }
+          },
+          "required": [
+            "accessToken",
+            "refreshToken"
+          ]
+        }
+      },
+      "required": [
+        "user",
+        "tokens"
+      ]
+    },
+    "SignIn": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "example": "test@gmail.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "sdfsDf34&"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    },
+    "RegisterModeratorOrAdmin": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Anton231096"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "example": "hello23@gmail.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "sdfsDf34&"
+        },
+        "phone": {
+          "type": "string",
+          "example": "+38093345000"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "admin",
+            "moderator"
+          ],
+          "example": "moderator"
+        }
+      },
+      "required": [
+        "name",
+        "email",
+        "password",
+        "phone",
+        "role"
+      ]
+    },
+    "Tokens": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmU5MTA1ODg3ZTQ0NzVkMzVjMGQ2MDEiLCJyb2xlIjoidXNlciIsImlhdCI6MTcyNjU1MDEwNSwiZXhwIjoxNzI2NTYwOTA1fQ.cU1WXGCg6FJrEaEqPFrC5FYkSAbR5oDXcjG95wOI1lM"
+        },
+        "refreshToken": {
+          "type": "string",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmU5MTA1ODg3ZTQ0NzVkMzVjMGQ2MDEiLCJyb2xlIjoidXNlciIsImlhdCI6MTcyNjU1MDEwNSwiZXhwIjoxNzI2NjM2NTA1fQ.u4BDLOPi4RUZEXsL6qSznR-Ah64lm3wU2V8xZGX2HvQ"
+        }
+      },
+      "required": [
+        "accessToken",
+        "refreshToken"
+      ]
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "66e2d8779a4fca98e3380fc4"
+        },
+        "name": {
+          "type": "string",
+          "example": "Anton23"
+        },
+        "email": {
+          "type": "string",
+          "example": "moderator@gmail.com"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "user",
+            "moderator",
+            "admin"
+          ],
+          "example": "moderator"
+        },
+        "phone": {
+          "type": "string",
+          "example": "+380933453453"
+        },
+        "package": {
+          "type": "string",
+          "enum": [
+            "base",
+            "premium"
+          ],
+          "example": "premium"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "blocked"
+          ],
+          "example": "active"
+        },
+        "isVerified": {
+          "type": "boolean",
+          "example": true
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2024-09-12T12:03:03.740Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2024-09-12T12:03:03.740Z"
+        }
+      },
+      "required": [
+        "_id",
+        "name",
+        "email",
+        "role",
+        "phone",
+        "package",
+        "status",
+        "isVerified",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "UpdatedUser": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "User name."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "User email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "User phone"
+        }
+      }
+    },
+    "UserListResponse": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          },
+          "description": "List of user objects."
+        },
+        "total": {
+          "type": "integer",
+          "description": "Total number of car listings."
+        },
+        "orderBy": {
+          "type": "string",
+          "description": "Field by which the results are ordered."
+        },
+        "order": {
+          "type": "string",
+          "description": "Order of the results, e.g., ascending or descending."
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Number of items per page."
+        },
+        "page": {
+          "type": "integer",
+          "description": "Current page number."
+        }
+      },
+      "required": [
+        "data",
+        "total",
+        "orderBy",
+        "order",
+        "limit",
+        "page"
+      ]
+    }
+  }
+}
+

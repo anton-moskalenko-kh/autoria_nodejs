@@ -7,7 +7,7 @@ const { Schema } = mongoose;
 
 const viewSchema = new Schema(
   {
-    adId: { type: Schema.Types.ObjectId, required: true, ref: AdsModel },
+    _adId: { type: Schema.Types.ObjectId, required: true, ref: AdsModel },
     timestamp: { type: Date, default: Date.now() },
   },
   {

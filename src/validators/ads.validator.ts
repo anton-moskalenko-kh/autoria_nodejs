@@ -1,5 +1,8 @@
 import joi from "joi";
 
+import { AdsListOrderByEnum } from "../enums/ads-list-order-by.enum";
+import { OrderEnum } from "../enums/order.enum";
+
 export class AdsValidator {
   private static brand = joi.string().trim();
   private static model = joi.string().trim();
@@ -37,5 +40,19 @@ export class AdsValidator {
     city: AdsValidator.city,
     isActive: AdsValidator.isActive,
     message: AdsValidator.message,
+  });
+
+  public static listQuery = joi.object({
+    limit: joi.number().min(1).max(10).default(10),
+    page: joi.number().default(1),
+    search: joi.string().trim(),
+    order: joi
+      .string()
+      .valid(...Object.values(OrderEnum))
+      .default(OrderEnum.ASC),
+    orderBy: joi
+      .string()
+      .valid(...Object.values(AdsListOrderByEnum))
+      .default(AdsListOrderByEnum.PRICE),
   });
 }

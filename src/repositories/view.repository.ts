@@ -5,11 +5,11 @@ import { ViewModel } from "../models/ViewModel";
 
 class ViewRepository {
   public async create(adId: string): Promise<void> {
-    await ViewModel.create({ adId: adId });
+    await ViewModel.create({ _adId: adId });
   }
 
   public async getTotalViews(adId: string): Promise<number> {
-    return await ViewModel.countDocuments({ adId: adId });
+    return await ViewModel.countDocuments({ _adId: adId });
   }
 
   public async getTodayViews(adId: string): Promise<number> {
@@ -21,7 +21,7 @@ class ViewRepository {
     const result = await ViewModel.aggregate([
       {
         $match: {
-          adId: new mongoose.Types.ObjectId(adId),
+          _adId: new mongoose.Types.ObjectId(adId),
           timestamp: { $gte: todayStart, $lte: todayEnd },
         },
       },
@@ -39,7 +39,7 @@ class ViewRepository {
     const result = await ViewModel.aggregate([
       {
         $match: {
-          adId: new mongoose.Types.ObjectId(adId),
+          _adId: new mongoose.Types.ObjectId(adId),
           timestamp: { $gte: oneWeekAgo, $lte: now },
         },
       },
@@ -57,7 +57,7 @@ class ViewRepository {
     const result = await ViewModel.aggregate([
       {
         $match: {
-          adId: new mongoose.Types.ObjectId(adId),
+          _adId: new mongoose.Types.ObjectId(adId),
           timestamp: { $gte: startOfMonth, $lte: endOfMonth },
         },
       },

@@ -1,16 +1,28 @@
+import { UploadedFile } from "express-fileupload";
+
 import { RoleEnum } from "../enums/role.enum";
 import { ApiError } from "../errors/api-error";
-import { IAdsInterface } from "../interfaces/ads.interface";
+import {
+  IAdsInterface,
+  IAdsListQuery,
+  IAdsResponseList,
+} from "../interfaces/ads.interface";
 import { IStatisticsInterface } from "../interfaces/statistics.interface";
 import { ITokenPayload } from "../interfaces/token.interface";
 import { IUserInterface } from "../interfaces/user.interface";
+import { AdPresenter } from "../presenters/ads.presenter";
 import { adsRepository } from "../repositories/ads.repository";
 import { userRepository } from "../repositories/user.repository";
 import { viewRepository } from "../repositories/view.repository";
+import { s3Service } from "./s3.service";
 
 class AdsService {
-  public async getAll(): Promise<IAdsInterface[]> {
-    return await adsRepository.getAll();
+  public async getAll(query: IAdsListQuery): Promise<IAdsResponseList> {
+    const [ads, total] = await adsRepository.getAll(query);
+    if (ads.length === 0) {
+      throw new ApiError("Ads not found", 404);
+    }
+    return AdPresenter.toResponseList(ads, total, query);
   }
 
   public async getById(adId: string): Promise<IAdsInterface> {
@@ -25,21 +37,27 @@ class AdsService {
     return await userRepository.getById(ads._userId.toString());
   }
 
-  public async getUserAds(userId: string): Promise<IAdsInterface[]> {
+  public async getUserAds(
+    userId: string,
+    query: IAdsListQuery,
+  ): Promise<IAdsResponseList> {
     const user = await userRepository.getById(userId);
     if (!user) {
-      throw new ApiError(`User with id ${userId} not found`, 404);
+      throw new ApiError(`User with id ${userId} not found`, 400);
     }
-
-    const result = await adsRepository.getUserActiveAds(userId);
-    if (result.length === 0) {
-      throw new ApiError("This user doesn't have any ands", 404);
+    const [ads, total] = await adsRepository.getUserActiveAds(userId, query);
+    if (ads.length === 0) {
+      throw new ApiError("This user doesn't have any ads", 404);
     }
-    return result;
+    return AdPresenter.toResponseList(ads, total, query);
   }
 
-  public async getInactiveAds(): Promise<IAdsInterface[]> {
-    return await adsRepository.getInactiveAds();
+  public async getInactiveAds(query: IAdsListQuery): Promise<IAdsResponseList> {
+    const [ads, total] = await adsRepository.getInactiveAds(query);
+    if (ads.length === 0) {
+      throw new ApiError("Ads not found", 404);
+    }
+    return AdPresenter.toResponseList(ads, total, query);
   }
 
   public async getStatistics(adId: string): Promise<IStatisticsInterface> {
@@ -120,9 +138,36 @@ class AdsService {
     }
   }
 
+  public async uploadImages(
+    adId: string,
+    files: UploadedFile[],
+  ): Promise<IAdsInterface> {
+    const ad = await adsRepository.getById(adId);
+    if (ad.images.length > 0) {
+      ad.images.map((file) => s3Service.deleteFile(file));
+    }
+    const uploadPromises = Array.isArray(files)
+      ? files.map((file) => s3Service.uploadFiles("carImages", adId, file))
+      : [];
+
+    const images = await Promise.all(uploadPromises);
+    const updatedAd = await adsRepository.updateById(adId, { images });
+    return updatedAd;
+  }
+
+  public async deleteImages(adId: string): Promise<IAdsInterface> {
+    const ad = await adsRepository.getById(adId);
+    if (ad.images.length > 0) {
+      ad.images.map((file) => s3Service.deleteFile(file));
+    } else {
+      throw new ApiError("This ad doesn't have any images", 404);
+    }
+    return await adsRepository.updateById(adId, { images: [] });
+  }
+
   private async isAdsExist(adId: string): Promise<void> {
-    const ads = await adsRepository.getById(adId);
-    if (!ads) {
+    const ad = await adsRepository.getById(adId);
+    if (!ad) {
       throw new ApiError(`Ads with id ${adId} is doesn't exist`, 404);
     }
   }

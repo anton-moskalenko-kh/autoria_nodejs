@@ -1,10 +1,40 @@
+import { FilterQuery, SortOrder } from "mongoose";
+
 import { StatusEnum } from "../enums/status.enum";
-import { IUserInterface } from "../interfaces/user.interface";
+import { UserListOrderByEnum } from "../enums/user-list-order-by.enum";
+import { IUserInterface, IUserListQuery } from "../interfaces/user.interface";
 import { UserModel } from "../models/UserModel";
 
 class UserRepository {
-  public async getAllUsers(): Promise<IUserInterface[]> {
-    return await UserModel.find();
+  public async getAllUsers(
+    query: IUserListQuery,
+  ): Promise<[IUserInterface[], number]> {
+    const filterObj: FilterQuery<IUserInterface> = {
+      isVerified: true,
+      status: StatusEnum.ACTIVE,
+    };
+
+    if (query.search) {
+      filterObj.$or = [
+        { name: { $regex: query.search, $options: "i" } },
+        { email: { $regex: query.search, $options: "i" } },
+      ];
+    }
+
+    const sortObj: { [key: string]: SortOrder } = {};
+    switch (query.orderBy) {
+      case UserListOrderByEnum.NAME:
+        sortObj.name = query.order;
+        break;
+      default:
+        throw new Error("Invalid orderBy");
+    }
+
+    const skip = (query.page - 1) * query.limit;
+    return await Promise.all([
+      UserModel.find(filterObj).sort(sortObj).limit(query.limit).skip(skip),
+      UserModel.countDocuments(filterObj),
+    ]);
   }
 
   public async getByParams(
@@ -23,7 +53,7 @@ class UserRepository {
 
   public async updateById(
     userId: string,
-    dto: IUserInterface,
+    dto: Partial<IUserInterface>,
   ): Promise<IUserInterface> {
     return await UserModel.findByIdAndUpdate(userId, dto, {
       returnDocument: "after",
@@ -39,6 +69,36 @@ class UserRepository {
     status: StatusEnum,
   ): Promise<void> {
     await UserModel.findByIdAndUpdate(userId, { $set: { status: status } });
+  }
+
+  public async getBlockedUser(
+    query: IUserListQuery,
+  ): Promise<[IUserInterface[], number]> {
+    const filterObj: FilterQuery<IUserInterface> = {
+      status: StatusEnum.BLOCKED,
+    };
+
+    if (query.search) {
+      filterObj.$or = [
+        { name: { $regex: query.search, $options: "i" } },
+        { email: { $regex: query.search, $options: "i" } },
+      ];
+    }
+
+    const sortObj: { [key: string]: SortOrder } = {};
+    switch (query.orderBy) {
+      case UserListOrderByEnum.NAME:
+        sortObj.name = query.order;
+        break;
+      default:
+        throw new Error("Invalid orderBy");
+    }
+
+    const skip = (query.page - 1) * query.limit;
+    return await Promise.all([
+      UserModel.find(filterObj).sort(sortObj).limit(query.limit).skip(skip),
+      UserModel.countDocuments(filterObj),
+    ]);
   }
 }
 

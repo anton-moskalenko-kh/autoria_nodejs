@@ -17,6 +17,12 @@ class TokenRepository {
   public async deleteById(id: string): Promise<void> {
     await TokenModel.deleteOne({ _id: id });
   }
+
+  public async deleteByParams(
+    params: FilterQuery<ITokenInterface>,
+  ): Promise<void> {
+    await TokenModel.deleteMany(params);
+  }
 }
 
 export const tokenRepository = new TokenRepository();
