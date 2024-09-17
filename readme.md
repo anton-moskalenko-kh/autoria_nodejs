@@ -26,7 +26,7 @@ My AutoRia Clone App is an API which built with Node.js, Express, and MongoDB (M
 
 ## Usage
 
-In order to see and test all available endpoints you can use Swagger running at http://localhost:3001/docs or Postman
+In order to see and test all available endpoints you can use Swagger running at http://localhost:3001/docs (chose Host where you will be run the project) or Postman
 
 Endpoint http://localhost:3001/ads/:adId/images where images deleted or uploaded to the advertisement you can test in Postman using form-data
 
