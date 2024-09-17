@@ -2,12 +2,16 @@ import joi from "joi";
 
 import { AdsListOrderByEnum } from "../enums/ads-list-order-by.enum";
 import { OrderEnum } from "../enums/order.enum";
+import { PriceEnum } from "../enums/price.enum";
 
 export class AdsValidator {
   private static brand = joi.string().trim();
   private static model = joi.string().trim();
   private static year = joi.number().min(1950).max(new Date().getFullYear());
   private static price = joi.number().min(100);
+  private static currency = joi
+    .string()
+    .valid(PriceEnum.USD, PriceEnum.EUR, PriceEnum.UAH);
   private static description = joi.string().min(20).max(2000);
   private static city = joi.string().trim();
   private static isActive = joi.boolean();
@@ -18,6 +22,7 @@ export class AdsValidator {
     model: AdsValidator.model.required(),
     year: AdsValidator.year.required(),
     price: AdsValidator.price.required(),
+    currency: AdsValidator.currency.required(),
     description: AdsValidator.description.required(),
     city: AdsValidator.city.required(),
   });
@@ -27,6 +32,7 @@ export class AdsValidator {
     model: AdsValidator.model,
     year: AdsValidator.year,
     price: AdsValidator.price,
+    currency: AdsValidator.currency,
     description: AdsValidator.description,
     city: AdsValidator.city,
   });
@@ -36,6 +42,7 @@ export class AdsValidator {
     model: AdsValidator.model,
     year: AdsValidator.year,
     price: AdsValidator.price,
+    currency: AdsValidator.currency,
     description: AdsValidator.description,
     city: AdsValidator.city,
     isActive: AdsValidator.isActive,

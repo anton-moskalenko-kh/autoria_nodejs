@@ -1078,6 +1078,10 @@
           "format": "float",
           "description": "Price of the car."
         },
+        "currency": {
+          "type": "number",
+          "description": "Currency of price"
+        },
         "description": {
           "type": "string",
           "description": "Description of the car."
@@ -1085,6 +1089,26 @@
         "city": {
           "type": "string",
           "description": "City where the car is located."
+        },
+        "priceInUSD": {
+          "type": "number",
+          "description": "Price in USD"
+        },
+        "priceInEUR": {
+          "type": "number",
+          "description": "Price in EUR"
+        },
+        "priceInUAH": {
+          "type": "number",
+          "description": "Price in UAH"
+        },
+        "exchangeRateUSD": {
+          "type": "number",
+          "description": "exchange rate UAH to USD"
+        },
+        "exchangeRateEUR": {
+          "type": "number",
+          "description": "exchange rate UAH to EUR"
         },
         "_userId": {
           "type": "string",
@@ -1115,6 +1139,12 @@
         "model",
         "year",
         "price",
+        "currency",
+        "priceInUSD",
+        "priceInEUR",
+        "priceInUAH",
+        "exchangeRateUSD",
+        "exchangeRateEUR",
         "description",
         "city",
         "_userId",

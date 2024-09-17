@@ -2,6 +2,7 @@ import { UploadedFile } from "express-fileupload";
 
 import { RoleEnum } from "../enums/role.enum";
 import { ApiError } from "../errors/api-error";
+import { getExchangeRates } from "../helpers/getExchangeRate";
 import {
   IAdsInterface,
   IAdsListQuery,
@@ -94,9 +95,36 @@ class AdsService {
           "The ad contains obscene language and can no longer be edited. Moderator will check your ad",
       });
     }
+    if (!["USD", "EUR", "UAH"].includes(dto.currency)) {
+      throw new ApiError("Invalid currency", 400);
+    }
+
+    const rates = await getExchangeRates();
+    let priceInUSD = dto.price;
+    let priceInEUR = dto.price;
+    let priceInUAH = dto.price;
+
+    if (dto.currency === "USD") {
+      priceInUSD = Math.trunc(dto.price);
+      priceInEUR = Math.trunc((dto.price * rates.USD) / rates.EUR);
+      priceInUAH = Math.trunc(dto.price * rates.USD);
+    } else if (dto.currency === "EUR") {
+      priceInEUR = Math.trunc(dto.price);
+      priceInUSD = Math.trunc((dto.price / rates.USD) * rates.EUR);
+      priceInUAH = Math.trunc(dto.price * rates.EUR);
+    } else if (dto.currency === "UAH") {
+      priceInUAH = Math.trunc(dto.price);
+      priceInUSD = Math.trunc(dto.price / rates.USD);
+      priceInEUR = Math.trunc(dto.price / rates.EUR);
+    }
     return await adsRepository.create({
       ...dto,
       _userId: payload.userId,
+      priceInUSD,
+      priceInEUR,
+      priceInUAH,
+      exchangeRateUSD: rates.USD,
+      exchangeRateEUR: rates.EUR,
     });
   }
 

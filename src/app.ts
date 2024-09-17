@@ -5,6 +5,7 @@ import swaggerUi from "swagger-ui-express";
 
 import swaggerSpec from "../docs/swagger.json";
 import { configs } from "./configs/configs";
+import { jobRunner } from "./crons";
 import { ApiError } from "./errors/api-error";
 import { adsRouter } from "./routers/ads.routers";
 import { authRouter } from "./routers/auth.router";
@@ -34,4 +35,5 @@ process.on("uncaughtException", (e) => {
 app.listen(configs.APP_PORT, configs.APP_HOST, async () => {
   await mongoose.connect(configs.MONGO_URL);
   console.log(`Server is running on port ${configs.APP_PORT}`);
+  jobRunner();
 });

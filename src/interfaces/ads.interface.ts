@@ -11,6 +11,12 @@ export interface IAdsInterface {
   price: number;
   description: string;
   city: string;
+  currency: string;
+  priceInUSD: number;
+  priceInEUR: number;
+  priceInUAH: number;
+  exchangeRateUSD: number;
+  exchangeRateEUR: number;
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -26,8 +32,14 @@ export interface IAdResponse
     | "model"
     | "year"
     | "images"
-    | "price"
     | "description"
+    | "price"
+    | "currency"
+    | "priceInUSD"
+    | "priceInEUR"
+    | "priceInUAH"
+    | "exchangeRateUSD"
+    | "exchangeRateEUR"
     | "city"
     | "isActive"
     | "message"
