@@ -7,6 +7,7 @@ import swaggerSpec from "../docs/swagger.json";
 import { configs } from "./configs/configs";
 import { jobRunner } from "./crons";
 import { ApiError } from "./errors/api-error";
+import { createFirstUser } from "./helpers/createFirstUser";
 import { adsRouter } from "./routers/ads.routers";
 import { authRouter } from "./routers/auth.router";
 import { userRouter } from "./routers/user.router";
@@ -35,5 +36,6 @@ process.on("uncaughtException", (e) => {
 app.listen(configs.APP_PORT, configs.APP_HOST, async () => {
   await mongoose.connect(configs.MONGO_URL);
   console.log(`Server is running on port ${configs.APP_PORT}`);
+  await createFirstUser();
   jobRunner();
 });

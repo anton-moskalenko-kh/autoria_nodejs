@@ -13,22 +13,7 @@ class UserRepository {
       isVerified: true,
       status: StatusEnum.ACTIVE,
     };
-
-    if (query.search) {
-      filterObj.$or = [
-        { name: { $regex: query.search, $options: "i" } },
-        { email: { $regex: query.search, $options: "i" } },
-      ];
-    }
-
-    const sortObj: { [key: string]: SortOrder } = {};
-    switch (query.orderBy) {
-      case UserListOrderByEnum.NAME:
-        sortObj.name = query.order;
-        break;
-      default:
-        throw new Error("Invalid orderBy");
-    }
+    const sortObj = await this.setQueryParams(query, filterObj);
 
     const skip = (query.page - 1) * query.limit;
     return await Promise.all([
@@ -77,7 +62,19 @@ class UserRepository {
     const filterObj: FilterQuery<IUserInterface> = {
       status: StatusEnum.BLOCKED,
     };
+    const sortObj = await this.setQueryParams(query, filterObj);
 
+    const skip = (query.page - 1) * query.limit;
+    return await Promise.all([
+      UserModel.find(filterObj).sort(sortObj).limit(query.limit).skip(skip),
+      UserModel.countDocuments(filterObj),
+    ]);
+  }
+
+  private async setQueryParams(
+    query: IUserListQuery,
+    filterObj: FilterQuery<IUserInterface>,
+  ): Promise<{ [key: string]: SortOrder }> {
     if (query.search) {
       filterObj.$or = [
         { name: { $regex: query.search, $options: "i" } },
@@ -93,12 +90,7 @@ class UserRepository {
       default:
         throw new Error("Invalid orderBy");
     }
-
-    const skip = (query.page - 1) * query.limit;
-    return await Promise.all([
-      UserModel.find(filterObj).sort(sortObj).limit(query.limit).skip(skip),
-      UserModel.countDocuments(filterObj),
-    ]);
+    return sortObj;
   }
 }
 

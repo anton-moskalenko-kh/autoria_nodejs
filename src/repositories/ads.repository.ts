@@ -9,34 +9,7 @@ class AdsRepository {
     query: IAdsListQuery,
   ): Promise<[IAdsInterface[], number]> {
     const filterObj: FilterQuery<IAdsInterface> = { isActive: true };
-    if (query.search) {
-      filterObj.$or = [
-        { brand: { $regex: query.search, $options: "i" } },
-        { model: { $regex: query.search, $options: "i" } },
-        { city: { $regex: query.search, $options: "i" } },
-      ];
-    }
-
-    const sortObj: { [key: string]: SortOrder } = {};
-    switch (query.orderBy) {
-      case AdsListOrderByEnum.BRAND:
-        sortObj.brand = query.order;
-        break;
-      case AdsListOrderByEnum.MODEL:
-        sortObj.model = query.order;
-        break;
-      case AdsListOrderByEnum.PRICE:
-        sortObj.price = query.order;
-        break;
-      case AdsListOrderByEnum.CITY:
-        sortObj.city = query.order;
-        break;
-      case AdsListOrderByEnum.YEAR:
-        sortObj.year = query.order;
-        break;
-      default:
-        throw new Error("Invalid orderBy");
-    }
+    const sortObj = await this.setQueryParams(query, filterObj);
 
     const skip = (query.page - 1) * query.limit;
     return await Promise.all([
@@ -49,34 +22,7 @@ class AdsRepository {
     query: IAdsListQuery,
   ): Promise<[IAdsInterface[], number]> {
     const filterObj: FilterQuery<IAdsInterface> = { isActive: false };
-    if (query.search) {
-      filterObj.$or = [
-        { brand: { $regex: query.search, $options: "i" } },
-        { model: { $regex: query.search, $options: "i" } },
-        { city: { $regex: query.search, $options: "i" } },
-      ];
-    }
-
-    const sortObj: { [key: string]: SortOrder } = {};
-    switch (query.orderBy) {
-      case AdsListOrderByEnum.BRAND:
-        sortObj.brand = query.order;
-        break;
-      case AdsListOrderByEnum.MODEL:
-        sortObj.model = query.order;
-        break;
-      case AdsListOrderByEnum.PRICE:
-        sortObj.price = query.order;
-        break;
-      case AdsListOrderByEnum.CITY:
-        sortObj.city = query.order;
-        break;
-      case AdsListOrderByEnum.YEAR:
-        sortObj.year = query.order;
-        break;
-      default:
-        throw new Error("Invalid orderBy");
-    }
+    const sortObj = await this.setQueryParams(query, filterObj);
 
     const skip = (query.page - 1) * query.limit;
     return await Promise.all([
@@ -107,35 +53,7 @@ class AdsRepository {
       _userId: userId,
       isActive: true,
     };
-
-    if (query.search) {
-      filterObj.$or = [
-        { brand: { $regex: query.search, $options: "i" } },
-        { model: { $regex: query.search, $options: "i" } },
-        { city: { $regex: query.search, $options: "i" } },
-      ];
-    }
-
-    const sortObj: { [key: string]: SortOrder } = {};
-    switch (query.orderBy) {
-      case AdsListOrderByEnum.BRAND:
-        sortObj.brand = query.order;
-        break;
-      case AdsListOrderByEnum.MODEL:
-        sortObj.model = query.order;
-        break;
-      case AdsListOrderByEnum.PRICE:
-        sortObj.price = query.order;
-        break;
-      case AdsListOrderByEnum.CITY:
-        sortObj.city = query.order;
-        break;
-      case AdsListOrderByEnum.YEAR:
-        sortObj.year = query.order;
-        break;
-      default:
-        throw new Error("Invalid orderBy");
-    }
+    const sortObj = await this.setQueryParams(query, filterObj);
 
     const skip = (query.page - 1) * query.limit;
     return await Promise.all([
@@ -149,34 +67,7 @@ class AdsRepository {
     query: IAdsListQuery,
   ): Promise<[IAdsInterface[], number]> {
     const filterObj: FilterQuery<IAdsInterface> = { _userId: userId };
-    if (query.search) {
-      filterObj.$or = [
-        { brand: { $regex: query.search, $options: "i" } },
-        { model: { $regex: query.search, $options: "i" } },
-        { city: { $regex: query.search, $options: "i" } },
-      ];
-    }
-
-    const sortObj: { [key: string]: SortOrder } = {};
-    switch (query.orderBy) {
-      case AdsListOrderByEnum.BRAND:
-        sortObj.brand = query.order;
-        break;
-      case AdsListOrderByEnum.MODEL:
-        sortObj.model = query.order;
-        break;
-      case AdsListOrderByEnum.PRICE:
-        sortObj.price = query.order;
-        break;
-      case AdsListOrderByEnum.CITY:
-        sortObj.city = query.order;
-        break;
-      case AdsListOrderByEnum.YEAR:
-        sortObj.year = query.order;
-        break;
-      default:
-        throw new Error("Invalid orderBy");
-    }
+    const sortObj = await this.setQueryParams(query, filterObj);
 
     const skip = (query.page - 1) * query.limit;
     return await Promise.all([
@@ -206,13 +97,13 @@ class AdsRepository {
       {
         $group: {
           _id: "$city",
-          averagePrice: { $avg: "$price" },
+          averagePrice: { $avg: "$priceInUSD" },
         },
       },
     ]);
 
     return result.length > 0
-      ? `Average price in ${city}: ${result[0].averagePrice}`
+      ? `Average price in ${city}: ${result[0].averagePrice} USD`
       : "Data is unknown";
   }
 
@@ -221,14 +112,55 @@ class AdsRepository {
       {
         $group: {
           _id: null,
-          averagePrice: { $avg: "$price" },
+          averagePrice: { $avg: "$priceInUSD" },
         },
       },
     ]);
 
     return result.length > 0
-      ? `Average price in Ukraine is: ${Math.trunc(result[0].averagePrice)}`
+      ? `Average price in Ukraine is: ${Math.trunc(result[0].averagePrice)} USD`
       : "Data is unknown";
+  }
+
+  private async setQueryParams(
+    query: IAdsListQuery,
+    filterObj: FilterQuery<IAdsInterface>,
+  ): Promise<{ [key: string]: SortOrder }> {
+    if (query.search) {
+      filterObj.$or = [
+        { brand: { $regex: query.search, $options: "i" } },
+        { model: { $regex: query.search, $options: "i" } },
+        { city: { $regex: query.search, $options: "i" } },
+      ];
+    }
+
+    const sortObj: { [key: string]: SortOrder } = {};
+    switch (query.orderBy) {
+      case AdsListOrderByEnum.BRAND:
+        sortObj.brand = query.order;
+        break;
+      case AdsListOrderByEnum.MODEL:
+        sortObj.model = query.order;
+        break;
+      case AdsListOrderByEnum.PRICE_IN_USD:
+        sortObj.priceInUSD = query.order;
+        break;
+      case AdsListOrderByEnum.PRICE_IN_EUR:
+        sortObj.priceInEUR = query.order;
+        break;
+      case AdsListOrderByEnum.PRICE_IN_UAH:
+        sortObj.priceInUAH = query.order;
+        break;
+      case AdsListOrderByEnum.CITY:
+        sortObj.city = query.order;
+        break;
+      case AdsListOrderByEnum.YEAR:
+        sortObj.year = query.order;
+        break;
+      default:
+        throw new Error("Invalid orderBy");
+    }
+    return sortObj;
   }
 }
 

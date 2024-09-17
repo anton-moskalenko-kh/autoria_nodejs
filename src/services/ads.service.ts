@@ -63,7 +63,7 @@ class AdsService {
 
   public async getStatistics(adId: string): Promise<IStatisticsInterface> {
     await this.isAdsExist(adId);
-    const { city } = await adsRepository.getById(adId);
+    const { city} = await adsRepository.getById(adId);
 
     const totalViews = await viewRepository.getTotalViews(adId);
     const todayViews = await viewRepository.getTodayViews(adId);
@@ -184,6 +184,7 @@ class AdsService {
   }
 
   public async deleteImages(adId: string): Promise<IAdsInterface> {
+    await this.isAdsExist(adId);
     const ad = await adsRepository.getById(adId);
     if (ad.images.length > 0) {
       ad.images.map((file) => s3Service.deleteFile(file));

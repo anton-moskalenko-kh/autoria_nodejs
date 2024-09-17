@@ -60,6 +60,6 @@ export class AdsValidator {
     orderBy: joi
       .string()
       .valid(...Object.values(AdsListOrderByEnum))
-      .default(AdsListOrderByEnum.PRICE),
+      .default(AdsListOrderByEnum.PRICE_IN_USD),
   });
 }

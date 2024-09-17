@@ -9,16 +9,18 @@ My AutoRia Clone App is an API which built with Node.js, Express, and MongoDB (M
     git clone https://github.com/anton-moskalenko-kh/autoria_nodejs.git
     ```
 
-2. Install dependencies:
+2. Install all necessary dependencies:
     ```bash
     npm install
     ```
 
-3. Create `.env` file in the root directory. Necessary variables for project you will find in .env example file. Replace data in empty variables for your own or contact with me in telegram
+3. Create `.env` file in the root directory. Necessary variables for project you will find in .env example file. Replace data in empty variables for your own or contact with me.
    
 
 4. Start the server:
+    ```bash
     npm run start:dev
+   ```
 
    The server will be running at `http://localhost:3001`.
 
