@@ -9,15 +9,11 @@ const handler = async () => {
     const rates = await getExchangeRates();
     const updatedAt = new Date();
 
-    await ExchangeRateModel.updateOne(
-      {},
-      {
-        USD: rates.USD,
-        EUR: rates.EUR,
-        updatedAt,
-      },
-      { upsert: true },
-    );
+    await ExchangeRateModel.create({
+      USD: rates.USD,
+      EUR: rates.EUR,
+      updatedAt,
+    });
 
     const ads = await AdsModel.find();
     for (const ad of ads) {
